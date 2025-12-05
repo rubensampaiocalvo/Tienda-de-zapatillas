@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Newshoes - Tienda Oficial</title>
     <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
 </head>
 <body>
     <!-- HEADER -->
@@ -26,12 +27,12 @@
         </div>
     </header>
 
-    <!-- HERO SECTION -->
+    
     <section id="inicio" class="hero">
         <div class="hero-content">
             <h2>Las Mejores Zapatillas del Mercado</h2>
             <p>Encuentra tu estilo perfecto con nuestra colección exclusiva</p>
-            <button class="btn-primary">Ver Colección</button>
+            <button class="btn-primary" onclick="mostrarTodosProductos()">Ver TODOS los Productos</button>
         </div>
     </section>
 
@@ -45,67 +46,90 @@
                 <input type="text" id="buscador" placeholder="🔍 Buscar Nike, Adidas, Running, Jordan..." class="buscador-input">
             </div>
             
-            <!-- FILTROS -->
-            <div class="filtros">
-                <button class="filtro-btn active">Todas</button>
-                <button class="filtro-btn">Running</button>
-                <button class="filtro-btn">Basket</button>
-                <button class="filtro-btn">Lifestyle</button>
+            <!-- CONTROLES DE ORDENAMIENTO Y FILTROS -->
+            <div class="controles-productos">
+                <!-- ORDENAMIENTO -->
+                <div class="ordenamiento">
+                    <label for="ordenar-por">Ordenar por:</label>
+                    <select id="ordenar-por" class="select-ordenar">
+                        <option value="nombre">Nombre (A-Z)</option>
+                        <option value="nombre-desc">Nombre (Z-A)</option>
+                        <option value="precio-asc">Precio (Menor a Mayor)</option>
+                        <option value="precio-desc">Precio (Mayor a Menor)</option>
+                        <option value="stock">Stock (Mayor a Menor)</option>
+                        <option value="destacados">Destacados Primero</option>
+                    </select>
+                </div>
+                
+                <!-- FILTROS -->
+                <div class="filtros">
+                    <button class="filtro-btn active" data-categoria="todas">Todas</button>
+                    <button class="filtro-btn" data-categoria="nike">Nike</button>
+                    <button class="filtro-btn" data-categoria="adidas">Adidas</button>
+                    <button class="filtro-btn" data-categoria="jordan">Jordan</button>
+                    <button class="filtro-btn" data-categoria="running">Running</button>
+                    <button class="filtro-btn" data-categoria="basket">Basket</button>
+                    <button class="filtro-btn" data-categoria="lifestyle">Lifestyle</button>
+                </div>
+            </div>
+            
+            <!-- CONTADOR DE PRODUCTOS -->
+            <div id="contador-productos" class="contador-productos">
+                Mostrando <span id="total-productos">0</span> productos
             </div>
             
             <!-- GRID DE PRODUCTOS -->
             <div id="grid-productos" class="grid-productos">
-                
+                <!-- Los productos aparecerán aquí ordenados -->
             </div>
         </div>
     </section>
+    
     <!-- MODAL DE LOGIN -->
-<div id="modalLogin" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Iniciar Sesión</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn-login-form">Ingresar</button>
-        </form>
-        <p class="register-link">¿No tienes cuenta? <a href="#" id="showRegister">Regístrate aquí</a></p>
+    <div id="modalLogin" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn-login-form">Ingresar</button>
+            </form>
+            <p class="register-link">¿No tienes cuenta? <a href="#" id="showRegister">Regístrate aquí</a></p>
+        </div>
     </div>
-</div>
 
-<!-- MODAL DE REGISTRO -->
-<div id="modalRegister" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Crear Cuenta</h2>
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="regNombre">Nombre completo:</label>
-                <input type="text" id="regNombre" name="nombre" required>
-            </div>
-            <div class="form-group">
-                <label for="regEmail">Email:</label>
-                <input type="email" id="regEmail" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="regPassword">Contraseña:</label>
-                <input type="password" id="regPassword" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="regDireccion">Dirección:</label>
-                <input type="text" id="regDireccion" name="direccion">
-            </div>
-            <button type="submit" class="btn-register-form">Crear Cuenta</button>
-        </form>
+    <!-- MODAL DE REGISTRO -->
+    <div id="modalRegister" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Crear Cuenta</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regNombre">Nombre completo:</label>
+                    <input type="text" id="regNombre" name="nombre" required placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" name="email" required placeholder="ejemplo@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Contraseña:</label>
+                    <input type="password" id="regPassword" name="password" required placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="form-group">
+                    <label for="regDireccion">Dirección:</label>
+                    <input type="text" id="regDireccion" name="direccion" placeholder="Calle, número, ciudad">
+                </div>
+                <button type="submit" class="btn-register-form">Crear Cuenta</button>
+            </form>
+        </div>
     </div>
-</div>
-
-    <script src="script.js"></script>
 </body>
 </html>

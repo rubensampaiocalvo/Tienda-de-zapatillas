@@ -1,10 +1,16 @@
+// script.js - VERSIÓN COMPLETA CON ORDENAMIENTO
 class Newshoes {
     constructor() {
         this.apiUrl = 'http://localhost:3000/api';
-        this.productos = [];
-        this.todosProductos = []; 
+        this.productos = [];  // Para búsquedas/filtrados
+        this.todosProductos = []; // Todos los productos para mostrar
+        this.productosFiltrados = []; // Productos filtrados actuales
         this.carrito = [];
         this.usuario = null;
+        
+        // Configuración de ordenamiento
+        this.ordenActual = 'nombre'; // Por defecto: nombre A-Z
+        this.categoriaActual = 'todas';
         
         console.log('🚀 Newshoes inicializado');
         this.verificarSesion();
@@ -12,67 +18,70 @@ class Newshoes {
     }
 
     async iniciar() {
-        await this.cargarProductos();
-        this.mostrarProductos();
-        this.configurarEventos();
-        
-        this.verificarConexion();
+        try {
+            // Cargar TODOS los productos
+            await this.cargarTodosProductos();
+            
+            // Configurar eventos y mostrar productos
+            this.configurarEventos();
+            this.configurarOrdenamiento();
+            this.mostrarProductosOrdenados();
+            
+            // Verificar conexión con el servidor
+            await this.verificarConexion();
+            
+            console.log('✅ Aplicación iniciada correctamente');
+        } catch (error) {
+            console.error('❌ Error al iniciar:', error);
+            this.mostrarError('Error al cargar la aplicación. Por favor, recarga la página.');
+        }
     }
 
     async verificarConexion() {
         try {
             const respuesta = await fetch(`${this.apiUrl}/status`);
+            if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+            
             const datos = await respuesta.json();
             
             if (datos.status === "ok") {
                 console.log('✅ Servidor conectado correctamente');
             } else {
                 console.error('❌ Error del servidor:', datos.message);
-                this.mostrarMensaje('Error de conexión con el servidor', 'error');
+                this.mostrarMensaje('Advertencia: Error de conexión con el servidor', 'error');
             }
         } catch (error) {
             console.error('❌ No se pudo conectar al servidor:', error);
-            this.mostrarMensaje('Error de conexión. Verifica que el servidor esté corriendo en localhost:3000', 'error');
+            this.mostrarMensaje('⚠️ Error de conexión. Verifica que el servidor esté corriendo en localhost:3000', 'warning');
         }
     }
 
     verificarSesion() {
         const usuarioGuardado = localStorage.getItem('usuario_newshoes');
         if (usuarioGuardado) {
-            this.usuario = JSON.parse(usuarioGuardado);
-            this.actualizarHeader();
-            console.log('👤 Usuario en sesión:', this.usuario.nombre);
+            try {
+                this.usuario = JSON.parse(usuarioGuardado);
+                this.actualizarHeader();
+                console.log('👤 Usuario en sesión:', this.usuario.nombre);
+            } catch (error) {
+                console.error('❌ Error al parsear usuario:', error);
+                localStorage.removeItem('usuario_newshoes');
+            }
         }
     }
 
     async cargarTodosProductos() {
-    try {
-        console.log('📦 Cargando TODOS los productos desde API...');
-        const respuesta = await fetch(`${this.apiUrl}/productos`);
-        
-        if (!respuesta.ok) {
-            throw new Error(`Error HTTP: ${respuesta.status}`);
-        }
-        
-        const datos = await respuesta.json();
-        
-        if (datos.error) {
-            throw new Error(datos.error);
-        }
-        
-        this.todosProductos = datos;
-        console.log(`✅ ${this.todosProductos.length} productos totales cargados`);
-        
-    } catch (error) {
-        console.error('❌ Error cargando todos los productos:', error);
-        this.mostrarError(`No se pudieron cargar todos los productos: ${error.message}`);
-    }
-}
-
-    async cargarProductos() {
         try {
-            console.log('📦 Cargando productos desde:', `${this.apiUrl}/zapatillas`);
-            const respuesta = await fetch(`${this.apiUrl}/zapatillas`);
+            console.log('📦 Cargando TODOS los productos...');
+            
+            // Intentar con /api/productos primero
+            let respuesta = await fetch(`${this.apiUrl}/productos`);
+            
+            // Si falla, intentar con /api/zapatillas como alternativa
+            if (!respuesta.ok) {
+                console.log('⚠️ /api/productos no disponible, intentando /api/zapatillas...');
+                respuesta = await fetch(`${this.apiUrl}/zapatillas`);
+            }
             
             if (!respuesta.ok) {
                 throw new Error(`Error HTTP: ${respuesta.status}`);
@@ -84,52 +93,319 @@ class Newshoes {
                 throw new Error(datos.error);
             }
             
-            this.productos = datos;
-            console.log(`✅ ${this.productos.length} productos cargados`);
+            // Guardar en ambos arrays
+            this.todosProductos = datos;
+            this.productos = [...datos]; // Copia para búsquedas
+            this.productosFiltrados = [...datos]; // Inicialmente todos los productos
+            
+            console.log(`✅ ${this.todosProductos.length} productos cargados`);
+            
+            // Si no hay productos, mostrar mensaje
+            if (this.todosProductos.length === 0) {
+                console.warn('⚠️ No hay productos en la base de datos');
+                this.mostrarMensaje('No hay productos disponibles', 'info');
+            }
             
         } catch (error) {
             console.error('❌ Error cargando productos:', error);
             this.mostrarError(`No se pudieron cargar los productos: ${error.message}`);
+            this.todosProductos = [];
+            this.productos = [];
+            this.productosFiltrados = [];
         }
     }
 
-    mostrarProductos() {
+    // ========== MÉTODOS DE ORDENAMIENTO ==========
+
+    configurarOrdenamiento() {
+        const selectOrdenar = document.getElementById('ordenar-por');
+        
+        if (!selectOrdenar) {
+            console.log('⚠️ No se encontró el selector de ordenamiento, creando uno dinámico...');
+            this.crearSelectorOrdenamiento();
+            return;
+        }
+        
+        selectOrdenar.addEventListener('change', (e) => {
+            this.ordenActual = e.target.value;
+            console.log(`🔄 Cambiando orden a: ${this.ordenActual}`);
+            this.mostrarProductosOrdenados();
+        });
+        
+        console.log('🎛️ Selector de ordenamiento configurado');
+    }
+
+    crearSelectorOrdenamiento() {
+        // Crear contenedor para ordenamiento si no existe
+        const filtrosContainer = document.querySelector('.filtros');
+        if (!filtrosContainer) return;
+        
+        const ordenamientoHTML = `
+            <div class="ordenamiento" style="margin-top: 20px;">
+                <label for="ordenar-por" style="margin-right: 10px;">Ordenar por:</label>
+                <select id="ordenar-por" class="select-ordenar" style="padding: 8px; border-radius: 5px;">
+                    <option value="nombre">Nombre (A-Z)</option>
+                    <option value="nombre-desc">Nombre (Z-A)</option>
+                    <option value="precio-asc">Precio (Menor a Mayor)</option>
+                    <option value="precio-desc">Precio (Mayor a Menor)</option>
+                    <option value="stock">Stock (Mayor a Menor)</option>
+                </select>
+            </div>
+        `;
+        
+        filtrosContainer.insertAdjacentHTML('afterend', ordenamientoHTML);
+        
+        // Configurar evento
+        setTimeout(() => {
+            this.configurarOrdenamiento();
+        }, 100);
+    }
+
+    ordenarProductos(productos) {
+        if (!productos || productos.length === 0) return productos;
+        
+        console.log(`📊 Ordenando ${productos.length} productos por: ${this.ordenActual}`);
+        
+        switch(this.ordenActual) {
+            case 'nombre':
+                // Ordenar por nombre A-Z
+                return [...productos].sort((a, b) => {
+                    const nombreA = (a.modelo || a.nombre || '').toLowerCase();
+                    const nombreB = (b.modelo || b.nombre || '').toLowerCase();
+                    return nombreA.localeCompare(nombreB);
+                });
+                
+            case 'nombre-desc':
+                // Ordenar por nombre Z-A
+                return [...productos].sort((a, b) => {
+                    const nombreA = (a.modelo || a.nombre || '').toLowerCase();
+                    const nombreB = (b.modelo || b.nombre || '').toLowerCase();
+                    return nombreB.localeCompare(nombreA);
+                });
+                
+            case 'precio-asc':
+                // Ordenar por precio de menor a mayor
+                return [...productos].sort((a, b) => {
+                    const precioA = parseFloat(a.precio || 0);
+                    const precioB = parseFloat(b.precio || 0);
+                    return precioA - precioB;
+                });
+                
+            case 'precio-desc':
+                // Ordenar por precio de mayor a menor
+                return [...productos].sort((a, b) => {
+                    const precioA = parseFloat(a.precio || 0);
+                    const precioB = parseFloat(b.precio || 0);
+                    return precioB - precioA;
+                });
+                
+            case 'stock':
+                // Ordenar por stock de mayor a menor
+                return [...productos].sort((a, b) => {
+                    const stockA = parseInt(a.stock || 0);
+                    const stockB = parseInt(b.stock || 0);
+                    return stockB - stockA;
+                });
+                
+            case 'destacados':
+                // Mostrar productos destacados primero (si tienen propiedad destacado)
+                return [...productos].sort((a, b) => {
+                    const destacadoA = a.destacado ? 1 : 0;
+                    const destacadoB = b.destacado ? 1 : 0;
+                    return destacadoB - destacadoA;
+                });
+                
+            default:
+                return productos;
+        }
+    }
+
+    filtrarPorCategoria(categoria) {
+        this.categoriaActual = categoria.toLowerCase();
+        
+        if (categoria === 'todas') {
+            this.productosFiltrados = [...this.todosProductos];
+        } else {
+            this.productosFiltrados = this.todosProductos.filter(producto => {
+                // Verificar por marca o categoría
+                const marca = (producto.marca || '').toLowerCase();
+                const cat = (producto.categoria || '').toLowerCase();
+                
+                return marca.includes(categoria) || 
+                       cat.includes(categoria) ||
+                       (producto.modelo || '').toLowerCase().includes(categoria);
+            });
+        }
+        
+        console.log(`🏷️ Filtrando por categoría: ${categoria} - ${this.productosFiltrados.length} productos`);
+        this.mostrarProductosOrdenados();
+    }
+
+    mostrarProductosOrdenados() {
+        // Ordenar los productos filtrados
+        const productosOrdenados = this.ordenarProductos(this.productosFiltrados);
+        
+        // Mostrar los productos ordenados
+        this.mostrarProductos(productosOrdenados);
+        
+        // Actualizar contador
+        this.actualizarContadorProductos();
+    }
+
+    mostrarProductos(productosAMostrar = null) {
+        console.log('🎯 Mostrando productos...');
+        
         const contenedor = document.getElementById('grid-productos');
         
         if (!contenedor) {
-            console.error('❌ No se encontró el contenedor de productos');
+            console.error('❌ No se encontró #grid-productos');
             return;
         }
 
-        if (!this.productos || this.productos.length === 0) {
-            contenedor.innerHTML = '<p class="no-productos">No hay productos disponibles</p>';
+        // Usar productos específicos o los filtrados
+        const productos = productosAMostrar || this.productosFiltrados;
+        
+        if (!productos || productos.length === 0) {
+            contenedor.innerHTML = `
+                <div class="no-productos" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <h3>😔 No se encontraron productos</h3>
+                    <p>Intenta cambiar los filtros o la búsqueda.</p>
+                </div>
+            `;
             return;
         }
 
-        contenedor.innerHTML = this.productos.map(producto => `
+        console.log(`📊 Mostrando ${productos.length} productos ordenados`);
+        
+        // Asegurar que el contenedor tenga grid
+        contenedor.style.display = 'grid';
+        contenedor.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+        contenedor.style.gap = '20px';
+        
+        // Crear HTML de productos
+        const productosHTML = productos.map(producto => `
             <div class="producto-card">
                 <div class="producto-imagen">
-                    <div class="imagen-placeholder">👟</div>
+                    <div class="imagen-placeholder">
+                        ${(producto.marca || '').toLowerCase().includes('nike') ? '✔️' : 
+                          (producto.marca || '').toLowerCase().includes('adidas') ? '🔷' : 
+                          (producto.marca || '').toLowerCase().includes('jordan') ? '🏀' : '👟'}
+                    </div>
                 </div>
                 <div class="producto-info">
                     <h3 class="producto-marca">${producto.marca || producto.categoria || 'Marca'}</h3>
                     <h4 class="producto-modelo">${producto.modelo || producto.nombre || 'Producto'}</h4>
-                    <p class="producto-descripcion">${producto.descripcion || 'Zapatilla de alta calidad'}</p>
-                    <div class="producto-precio">€${producto.precio || '0.00'}</div>
-                    <div class="producto-stock">Stock: ${producto.stock || 0}</div>
-                    <button class="btn-agregar" data-id="${producto.id_producto || producto.id || '1'}" 
-                            data-modelo="${producto.modelo || producto.nombre}" 
-                            data-precio="${producto.precio}">
-                        Agregar al Carrito
+                    <p class="producto-descripcion">${producto.descripcion || 'Producto de alta calidad'}</p>
+                    
+                    <div class="producto-detalles">
+                        <div class="producto-precio">€${parseFloat(producto.precio || 0).toFixed(2)}</div>
+                        <div class="producto-stock" style="color: ${(producto.stock || 0) > 0 ? '#28a745' : '#dc3545'};">
+                            ${(producto.stock || 0) > 0 ? `Stock: ${producto.stock}` : 'Agotado'}
+                        </div>
+                    </div>
+                    
+                    <button class="btn-agregar" 
+                            data-id="${producto.id_producto || producto.id || '1'}" 
+                            data-modelo="${producto.modelo || producto.nombre || 'Producto'}" 
+                            data-precio="${producto.precio || 0}"
+                            ${(producto.stock || 0) === 0 ? 'disabled style="background: #ccc;"' : ''}>
+                        ${(producto.stock || 0) === 0 ? 'Agotado' : 'Agregar al Carrito'}
                     </button>
                 </div>
             </div>
         `).join('');
+        
+        contenedor.innerHTML = productosHTML;
+        console.log('✅ Grid de productos creado y ordenado');
     }
+
+    actualizarContadorProductos() {
+        const contador = document.getElementById('contador-productos');
+        const totalSpan = document.getElementById('total-productos');
+        
+        if (contador && totalSpan) {
+            totalSpan.textContent = this.productosFiltrados.length;
+            
+            // Mostrar información del ordenamiento actual
+            const ordenText = this.obtenerTextoOrdenamiento();
+            contador.innerHTML = `Mostrando <span id="total-productos">${this.productosFiltrados.length}</span> productos <span style="color: #666; font-size: 0.9rem;">(${ordenText})</span>`;
+        }
+    }
+
+    obtenerTextoOrdenamiento() {
+        const textos = {
+            'nombre': 'ordenados por nombre A-Z',
+            'nombre-desc': 'ordenados por nombre Z-A',
+            'precio-asc': 'ordenados por precio menor a mayor',
+            'precio-desc': 'ordenados por precio mayor a menor',
+            'stock': 'ordenados por stock mayor a menor',
+            'destacados': 'destacados primero'
+        };
+        
+        return textos[this.ordenActual] || 'ordenados';
+    }
+
+buscarProductos(termino) {
+    const buscador = document.getElementById('buscador');
+    const seccionProductos = document.querySelector('#productos');
+    
+    if (!termino.trim()) {
+        // Si la búsqueda está vacía, mostrar todos
+        this.productosFiltrados = [...this.todosProductos];
+        this.mostrarProductosOrdenados();
+        
+        // Quitar clase de búsqueda
+        if (seccionProductos) {
+            seccionProductos.classList.remove('buscando');
+        }
+        return;
+    }
+
+    const terminoLower = termino.toLowerCase();
+    
+    // Filtrar productos
+    this.productosFiltrados = this.todosProductos.filter(p => {
+        const modelo = (p.modelo || p.nombre || '').toLowerCase();
+        const marca = (p.marca || p.categoria || '').toLowerCase();
+        const descripcion = (p.descripcion || '').toLowerCase();
+        
+        return modelo.includes(terminoLower) ||
+               marca.includes(terminoLower) ||
+               descripcion.includes(terminoLower);
+    });
+
+    console.log(`🔍 Resultados búsqueda: ${this.productosFiltrados.length} productos`);
+    
+    // Añadir clase para estilos especiales
+    if (seccionProductos) {
+        seccionProductos.classList.add('buscando');
+    }
+    
+    // Mostrar resultados
+    this.mostrarProductosOrdenados();
+    
+    // Desplazar a los resultados si hay alguno
+    if (this.productosFiltrados.length > 0 && seccionProductos) {
+        setTimeout(() => {
+            seccionProductos.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 300); // Pequeño delay para que se renderice primero
+    }
+    
+    // Mantener foco en el buscador
+    if (buscador) {
+        buscador.focus();
+    }
+}
+
+    // ========== CONFIGURACIÓN DE EVENTOS ==========
 
     configurarEventos() {
         console.log('🔧 Configurando eventos...');
         
+        // Login
         const btnLogin = document.querySelector('.btn-login');
         if (btnLogin) {
             btnLogin.addEventListener('click', () => {
@@ -138,6 +414,7 @@ class Newshoes {
             });
         }
 
+        // Carrito
         const btnCarrito = document.querySelector('.btn-carrito');
         if (btnCarrito) {
             btnCarrito.addEventListener('click', () => {
@@ -146,6 +423,7 @@ class Newshoes {
             });
         }
 
+        // Botón "Ver TODOS los Productos"
         const btnColeccion = document.querySelector('.btn-primary');
         if (btnColeccion) {
             btnColeccion.addEventListener('click', () => {
@@ -156,6 +434,7 @@ class Newshoes {
             });
         }
 
+        // Buscador
         const buscador = document.getElementById('buscador');
         if (buscador) {
             buscador.addEventListener('input', (e) => {
@@ -163,12 +442,27 @@ class Newshoes {
             });
         }
 
+        // Filtros
+        document.querySelectorAll('.filtro-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Quitar clase active a todos
+                document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+                // Agregar al botón clickeado
+                e.target.classList.add('active');
+                
+                const categoria = e.target.textContent.toLowerCase();
+                this.filtrarPorCategoria(categoria);
+            });
+        });
+
+        // Cerrar modales
         document.querySelectorAll('.close').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.cerrarModales();
             });
         });
 
+        // Link para mostrar registro
         const linkRegistro = document.getElementById('showRegister');
         if (linkRegistro) {
             linkRegistro.addEventListener('click', (e) => {
@@ -177,6 +471,7 @@ class Newshoes {
             });
         }
 
+        // Formulario de login
         const formLogin = document.getElementById('loginForm');
         if (formLogin) {
             formLogin.addEventListener('submit', (e) => {
@@ -185,6 +480,7 @@ class Newshoes {
             });
         }
 
+        // Formulario de registro
         const formRegistro = document.getElementById('registerForm');
         if (formRegistro) {
             formRegistro.addEventListener('submit', (e) => {
@@ -193,84 +489,30 @@ class Newshoes {
             });
         }
 
+        // Cerrar modales al hacer clic fuera
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 this.cerrarModales();
             }
         });
 
+        // Agregar al carrito
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('btn-agregar')) {
                 const id = e.target.getAttribute('data-id');
                 const modelo = e.target.getAttribute('data-modelo');
                 const precio = e.target.getAttribute('data-precio');
-                this.agregarAlCarrito(id, modelo, precio);
+                
+                if (!e.target.disabled) {
+                    this.agregarAlCarrito(id, modelo, precio);
+                }
             }
         });
 
         console.log('✅ Eventos configurados');
     }
 
-    mostrarModal(idModal) {
-        const modal = document.getElementById(idModal);
-        if (modal) {
-            modal.style.display = 'block';
-        }
-    }
-
-    cerrarModales() {
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.style.display = 'none';
-        });
-    }
-
-    buscarProductos(termino) {
-        if (!termino.trim()) {
-            this.mostrarProductos();
-            return;
-        }
-
-        const filtrados = this.productos.filter(p => {
-            const modelo = p.modelo || p.nombre || '';
-            const marca = p.marca || p.categoria || '';
-            const descripcion = p.descripcion || '';
-            
-            return modelo.toLowerCase().includes(termino.toLowerCase()) ||
-                   marca.toLowerCase().includes(termino.toLowerCase()) ||
-                   descripcion.toLowerCase().includes(termino.toLowerCase());
-        });
-
-        this.mostrarProductosFiltrados(filtrados);
-    }
-
-    mostrarProductosFiltrados(productos) {
-        const contenedor = document.getElementById('grid-productos');
-        if (!contenedor) return;
-        
-        if (!productos || productos.length === 0) {
-            contenedor.innerHTML = '<p class="no-productos">No se encontraron productos</p>';
-            return;
-        }
-
-        contenedor.innerHTML = productos.map(p => `
-            <div class="producto-card">
-                <div class="producto-imagen">
-                    <div class="imagen-placeholder">👟</div>
-                </div>
-                <div class="producto-info">
-                    <h3 class="producto-marca">${p.marca || p.categoria || 'Marca'}</h3>
-                    <h4 class="producto-modelo">${p.modelo || p.nombre || 'Producto'}</h4>
-                    <p class="producto-precio">€${p.precio || '0.00'}</p>
-                    <button class="btn-agregar" data-id="${p.id_producto || p.id || '1'}" 
-                            data-modelo="${p.modelo || p.nombre}" 
-                            data-precio="${p.precio}">
-                        Agregar al Carrito
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
+    // ========== MÉTODOS DE AUTENTICACIÓN (Mantener igual) ==========
     async iniciarSesion() {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
@@ -281,7 +523,7 @@ class Newshoes {
         }
 
         try {
-            console.log('🔑 Intentando login en:', `${this.apiUrl}/login`);
+            console.log('🔑 Intentando login...');
             
             const respuesta = await fetch(`${this.apiUrl}/login`, {
                 method: 'POST',
@@ -327,7 +569,7 @@ class Newshoes {
         }
 
         try {
-            console.log('📝 Registrando usuario en:', `${this.apiUrl}/registro`);
+            console.log('📝 Registrando usuario...');
             
             const respuesta = await fetch(`${this.apiUrl}/registro`, {
                 method: 'POST',
@@ -360,6 +602,20 @@ class Newshoes {
         this.mostrarMensaje('Sesión cerrada');
     }
 
+    // ========== MÉTODOS DE INTERFAZ (Mantener igual) ==========
+    mostrarModal(idModal) {
+        const modal = document.getElementById(idModal);
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    }
+
+    cerrarModales() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
+
     actualizarHeader() {
         const userActions = document.querySelector('.user-actions');
         if (!userActions) return;
@@ -378,11 +634,11 @@ class Newshoes {
             `;
             
             setTimeout(() => {
-                const btnLogin = document.querySelector('.btn-login');
+                const btnLogin = userActions.querySelector('.btn-login');
                 if (btnLogin) {
                     btnLogin.addEventListener('click', () => this.mostrarModal('modalLogin'));
                 }
-            }, 100);
+            }, 50);
         }
     }
 
@@ -424,27 +680,36 @@ class Newshoes {
         }
 
         console.log('Carrito del usuario:', carrito);
-        this.mostrarMensaje(`Carrito: ${carrito.length} productos`);
+        this.mostrarMensaje(`🛒 Carrito: ${carrito.length} productos`);
     }
 
     mostrarMensaje(texto, tipo = 'exito') {
         const mensajesAnteriores = document.querySelectorAll('.mensaje-flotante');
         mensajesAnteriores.forEach(msg => msg.remove());
         
+        const colores = {
+            exito: '#4CAF50',
+            error: '#f44336',
+            warning: '#ff9800',
+            info: '#2196F3'
+        };
+        
         const mensaje = document.createElement('div');
         mensaje.className = `mensaje-flotante mensaje-${tipo}`;
         mensaje.textContent = texto;
         mensaje.style.cssText = `
             position: fixed;
-            top: 100px;
+            top: 20px;
             right: 20px;
-            background: ${tipo === 'error' ? '#f44336' : '#4CAF50'};
+            background: ${colores[tipo] || colores.info};
             color: white;
             padding: 15px 20px;
             border-radius: 5px;
             z-index: 1000;
             animation: slideIn 0.3s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+            word-wrap: break-word;
         `;
         document.body.appendChild(mensaje);
 
@@ -459,19 +724,107 @@ class Newshoes {
     }
 }
 
-let tienda;
+// Función global para mostrar todos los productos
+function mostrarTodosProductos() {
+    if (tienda && tienda.mostrarProductosOrdenados) {
+        tienda.mostrarProductosOrdenados();
+        
+        // Cambiar el título
+        const titulo = document.querySelector('#productos h2');
+        if (titulo) {
+            titulo.textContent = 'TODOS Nuestros Productos';
+        }
+        
+        // Desplazar a la sección
+        const seccion = document.querySelector('#productos');
+        if (seccion) {
+            seccion.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    // Agrega esto al final de tu script.js, antes del cierre
 
+// Función para forzar el grid si no se aplica
+function forzarGridProductos() {
+    const grid = document.getElementById('grid-productos');
+    if (grid) {
+        const computedStyle = window.getComputedStyle(grid);
+        
+        // Verificar si el grid no está aplicado
+        if (computedStyle.display !== 'grid') {
+            console.log('⚠️ Grid no aplicado, forzando...');
+            
+            // Aplicar estilos inline para forzar el grid
+            grid.style.cssText = `
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 25px !important;
+                padding: 20px 0 !important;
+                width: 100% !important;
+                justify-items: center !important;
+            `;
+            
+            // Asegurar que cada tarjeta sea bloque
+            const cards = grid.querySelectorAll('.producto-card');
+            cards.forEach(card => {
+                card.style.cssText = `
+                    display: flex !important;
+                    flex-direction: column !important;
+                    width: 100% !important;
+                    max-width: 350px !important;
+                    margin: 0 !important;
+                `;
+            });
+            
+            console.log('✅ Grid forzado aplicado');
+        } else {
+            console.log('✅ Grid ya está aplicado correctamente');
+            console.log('Columnas:', computedStyle.gridTemplateColumns);
+            console.log('Número de productos:', grid.children.length);
+        }
+    } else {
+        console.error('❌ No se encontró #grid-productos');
+    }
+}
+
+// Llamar después de cargar productos
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('📄 DOM cargado');
-    tienda = new Newshoes();
+    // Esperar un momento para que se carguen los productos
+    setTimeout(() => {
+        forzarGridProductos();
+    }, 1500);
 });
 
+// También forzar después de actualizar productos
+if (typeof tienda !== 'undefined' && tienda.mostrarProductos) {
+    const originalMostrarProductos = tienda.mostrarProductos;
+    tienda.mostrarProductos = function(...args) {
+        const result = originalMostrarProductos.apply(this, args);
+        setTimeout(() => {
+            forzarGridProductos();
+        }, 100);
+        return result;
+    };
+}
+}
 
-window.tienda = tienda;
 
-if (!document.querySelector('#estilos-newshoes')) {
+// Hacer disponible globalmente
+window.mostrarTodosProductos = mostrarTodosProductos;
+
+// Variable global de la tienda
+let tienda;
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM cargado - Iniciando Newshoes...');
+    tienda = new Newshoes();
+    window.tienda = tienda;
+});
+
+// Agregar estilos dinámicos para ordenamiento
+if (!document.querySelector('#estilos-ordenamiento')) {
     const estilos = document.createElement('style');
-    estilos.id = 'estilos-newshoes';
+    estilos.id = 'estilos-ordenamiento';
     estilos.textContent = `
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -481,94 +834,49 @@ if (!document.querySelector('#estilos-newshoes')) {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(100%); opacity: 0; }
         }
-        .producto-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .producto-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        .producto-imagen {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .imagen-placeholder {
-            font-size: 4rem;
-            background: #f0f0f0;
-            border-radius: 10px;
-            padding: 20px;
-        }
-        .producto-marca {
-            color: #e44d26;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        .producto-modelo {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .producto-descripcion {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-        .producto-precio {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #e44d26;
-            margin-bottom: 5px;
-        }
-        .producto-stock {
-            color: #28a745;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-        .btn-agregar {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-        }
-        .btn-agregar:hover {
-            background: #e44d26;
-        }
-        .no-productos {
-            text-align: center;
-            grid-column: 1 / -1;
-            font-size: 1.2rem;
-            color: #666;
-            padding: 40px;
-        }
-        .user-logged {
+        
+        .ordenamiento {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin: 20px 0;
         }
-        .user-info {
+        
+        .ordenamiento label {
+            font-weight: 600;
             color: #333;
-            font-weight: 500;
         }
-        .btn-logout {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 6px 12px;
+        
+        .select-ordenar {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
             border-radius: 5px;
+            background: white;
+            font-size: 1rem;
             cursor: pointer;
-            font-size: 0.9rem;
+            transition: all 0.3s;
         }
-        .btn-logout:hover {
-            background: #d32f2f;
+        
+        .select-ordenar:focus {
+            border-color: #e44d26;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(228, 77, 38, 0.2);
+        }
+        
+        .producto-detalles {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .btn-agregar:disabled {
+            background-color: #cccccc !important;
+            cursor: not-allowed;
+        }
+        
+        .btn-agregar:disabled:hover {
+            background-color: #cccccc !important;
         }
     `;
     document.head.appendChild(estilos);

@@ -100,14 +100,15 @@ body {
 
 /* PRODUCTOS */
 .productos {
-    padding: 80px 0;
+    padding: 120px 0;
 }
 
 .productos h2 {
     text-align: center;
     font-size: 2.5rem;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
     color: #333;
+    
 }
 
 /* BUSCADOR */
@@ -134,20 +135,71 @@ body {
     transform: translateY(-2px);
 }
 
+/* ========== CONTROLES DE PRODUCTOS (NUEVO) ========== */
+.controles-productos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0;
+    flex-wrap: wrap;
+    gap: 20px;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* ORDENAMIENTO */
+.ordenamiento {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ordenamiento label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.select-ordenar {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 200px;
+}
+
+.select-ordenar:focus {
+    border-color: #e44d26;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(228, 77, 38, 0.2);
+}
+
+.select-ordenar:hover {
+    border-color: #ccc;
+}
+
 /* FILTROS */
 .filtros {
-    text-align: center;
-    margin-bottom: 40px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .filtro-btn {
     background: white;
-    border: 2px solid #ddd;
-    padding: 10px 20px;
-    margin: 0 10px;
-    border-radius: 25px;
+    border: 2px solid #e0e0e0;
+    padding: 8px 16px;
+    border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s;
+    font-size: 0.85rem;
+    color: #555;
+    font-weight: 500;
 }
 
 .filtro-btn.active,
@@ -155,23 +207,67 @@ body {
     background: #e44d26;
     color: white;
     border-color: #e44d26;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(228, 77, 38, 0.2);
 }
 
-/* GRID DE PRODUCTOS */
-.grid-productos {
+/* CONTADOR DE PRODUCTOS */
+.contador-productos {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 10px 0 20px 0;
+    text-align: center;
+    padding: 10px;
+    background: #f0f0f0;
+    border-radius: 5px;
+}
+
+#total-productos {
+    font-weight: bold;
+    color: #e44d26;
+    font-size: 1.1rem;
+}
+
+
+/* CONTENEDOR PRINCIPAL DEL GRID */
+.grid_products {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
     padding: 20px 0;
+    width: 100%;
+    justify-items: center;
+    
+    /* CORREGIR ESTO: */
+    margin-top: 20px;      /* Solo 20px de espacio arriba */
+    margin-left: 0;        /* Centrado normal */
+    
+    /* O si quieres centrarlo horizontalmente: */
+    margin: 20px auto 0 auto; /* 20px arriba, centrado horizontal */
 }
 
-/* TARJETAS DE PRODUCTO */
+/* ESTILO PARA EL ID TAMBIÉN */
+#grid-productos {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 25px !important;
+    padding: 20px 0 !important;
+    width: 100% !important;
+    justify-items: center !important;
+}
+
+/* TARJETA DE PRODUCTO */
 .producto-card {
     background: white;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     transition: transform 0.3s, box-shadow 0.3s;
+    width: 100%;
+    max-width: 350px; /* Ancho máximo para controlar el tamaño */
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
 }
 
 .producto-card:hover {
@@ -182,6 +278,10 @@ body {
 .producto-imagen {
     text-align: center;
     margin-bottom: 15px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .imagen-placeholder {
@@ -189,6 +289,11 @@ body {
     background: #f0f0f0;
     border-radius: 10px;
     padding: 20px;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .producto-marca {
@@ -202,12 +307,15 @@ body {
     font-size: 1.2rem;
     margin-bottom: 10px;
     color: #333;
+    min-height: 50px;
 }
 
 .producto-descripcion {
     color: #666;
     font-size: 0.9rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    flex-grow: 1;
+    min-height: 60px;
 }
 
 .producto-precio {
@@ -227,11 +335,13 @@ body {
     background: #333;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
     transition: background 0.3s;
+    font-size: 1rem;
+    margin-top: auto; /* Empuja el botón al fondo */
 }
 
 .btn-agregar:hover {
@@ -244,6 +354,64 @@ body {
     font-size: 1.2rem;
     color: #666;
     padding: 40px;
+}
+
+/* RESPONSIVE PARA EL GRID */
+@media (max-width: 1024px) {
+    .grid-productos, #grid-productos {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en tablet grande */
+    }
+}
+
+@media (max-width: 768px) {
+    .controles-productos {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .ordenamiento {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .select-ordenar {
+        width: 70%;
+    }
+    
+    .filtros {
+        justify-content: center;
+    }
+    
+    .grid-productos, #grid-productos {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en tablet */
+        gap: 20px;
+    }
+    
+    .producto-card {
+        min-height: 380px;
+    }
+}
+
+@media (max-width: 480px) {
+    .select-ordenar {
+        min-width: 150px;
+        font-size: 0.9rem;
+    }
+    
+    .filtro-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .grid-productos, #grid-productos {
+        grid-template-columns: 1fr; /* 1 columna en móvil */
+        gap: 15px;
+    }
+    
+    .producto-card {
+        min-height: 350px;
+        max-width: 100%;
+    }
 }
 
 /* ANIMACIONES */
@@ -373,4 +541,113 @@ body {
 
 .btn-logout:hover {
     background: #d32f2f;
+}
+
+/* OCULTAR LA TABLA DE ARRIBA QUE NO NECESITAS */
+table {
+    display: none !important;
+}
+
+/* O si tiene una clase específica */
+.lifestyle-table,
+.runner-table,
+.basket-table {
+    display: none !important;
+}
+
+/* FORZAR VISIBILIDAD DEL GRID - DIAGNÓSTICO */
+#grid-productos {
+    border: 5px solid green !important;
+    background: rgba(0, 255, 0, 0.2) !important;
+    min-height: 500px !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    
+    /* AÑADE ESTO PARA MOVERLO ABAJO: */
+    margin-top: 2100px !important; /* 50px hacia abajo */
+}
+
+/* Si el grid sigue vacío, mostrar productos de ejemplo */
+#grid-productos:empty::before {
+    content: "⚠️ Grid está vacío. Cargando productos de ejemplo...";
+    display: block;
+    padding: 50px;
+    text-align: center;
+    color: red;
+    font-size: 1.2rem;
+    grid-column: 1 / -1;
+}
+
+#grid-productos:empty::after {
+    content: "";
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    grid-column: 1 / -1;
+}
+/* ========== ESTILOS PARA BÚSQUEDA DINÁMICA ========== */
+
+/* NORMALMENTE: productos con espacio abajo */
+#grid-productos {
+    margin-top: 60px; /* Espacio por defecto */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* CUANDO SE BUSCA: productos suben arriba */
+#productos.buscando #grid-productos {
+    margin-top: 10px !important; /* Casi arriba */
+    transform: translateY(-15px);
+    animation: destacarBusqueda 0.5s ease;
+}
+
+/* Animación para destacar resultados */
+@keyframes destacarBusqueda {
+    0% {
+        transform: translateY(0);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateY(-25px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-15px);
+        opacity: 1;
+    }
+}
+
+/* CONTADOR durante búsqueda */
+#productos.buscando #contador-productos {
+    background: linear-gradient(135deg, #e44d26, #ff6b3d) !important;
+    color: white !important;
+    font-weight: bold !important;
+    box-shadow: 0 4px 15px rgba(228, 77, 38, 0.3);
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+/* RESET COMPLETO DE POSICIÓN */
+#productos,
+#productos *,
+#grid-productos,
+#grid-productos * {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    float: none !important;
+    clear: none !important;
+    display: block !important;
+}
+
+/* LUEGO reconstruir el grid */
+#grid-productos {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 25px !important;
+    margin: 20px 0 !important;
 }
