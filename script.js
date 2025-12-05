@@ -45,6 +45,30 @@ class Newshoes {
         }
     }
 
+    async cargarTodosProductos() {
+    try {
+        console.log('📦 Cargando TODOS los productos desde API...');
+        const respuesta = await fetch(`${this.apiUrl}/productos`);
+        
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+        
+        const datos = await respuesta.json();
+        
+        if (datos.error) {
+            throw new Error(datos.error);
+        }
+        
+        this.todosProductos = datos;
+        console.log(`✅ ${this.todosProductos.length} productos totales cargados`);
+        
+    } catch (error) {
+        console.error('❌ Error cargando todos los productos:', error);
+        this.mostrarError(`No se pudieron cargar todos los productos: ${error.message}`);
+    }
+}
+
     async cargarProductos() {
         try {
             console.log('📦 Cargando productos desde:', `${this.apiUrl}/zapatillas`);
