@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Middleware para logging de todas las peticiones
+
 app.use((req, res, next) => {
     console.log(`📦 ${new Date().toLocaleTimeString()} - ${req.method} ${req.url}`);
     next();
@@ -54,7 +54,7 @@ app.get("/:page", (req, res) => {
     if (fs.existsSync(filePath)) {
         res.sendFile(filePath);
     } else {
-        // Si no existe, redirigir al index
+        
         res.sendFile(path.join(__dirname, "index.html"));
     }
 });
@@ -275,9 +275,35 @@ app.get("/api/carrito/:usuarioId", (req, res) => {
     });
 });
 
-// Middleware para manejar errores 404
+
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, "index.html"));
+});
+
+// Ruta para obtener TODOS los productos
+app.get("/api/productos", (req, res) => {
+    console.log("📦 Consultando TODOS los productos...");
+    
+    const query = `
+        SELECT 
+            id_producto,
+            nombre as modelo,
+            precio,
+            descripcion,
+            stock,
+            categoria as marca
+        FROM producto
+        ORDER BY id_producto DESC
+    `;
+    
+    db.query(query, (err, results) => {
+        if(err) {
+            console.error("❌ Error en consulta productos:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        console.log(`✅ ${results.length} productos encontrados`);
+        res.json(results);
+    });
 });
 
 const PORT = 3000;
@@ -347,3 +373,4 @@ app.get("/api/productos/categoria/:categoria", (req, res) => {
         res.json(results);
     });
 });
+
