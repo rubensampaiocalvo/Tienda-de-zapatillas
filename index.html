@@ -131,5 +131,86 @@
             </form>
         </div>
     </div>
+    <!-- MODAL DEL CARRITO -->
+<div id="modalCarrito" class="modal">
+    <div class="modal-content carrito-modal">
+        <span class="close">&times;</span>
+        <h2>🛒 Tu Carrito de Compras</h2>
+        
+        <div id="carrito-vacio" class="carrito-vacio">
+            <p>Tu carrito está vacío</p>
+            <button class="btn-seguir-comprando" onclick="tienda.cerrarModales()">Seguir Comprando</button>
+        </div>
+        
+        <div id="carrito-contenido" class="carrito-contenido" style="display: none;">
+            <div class="carrito-items" id="carrito-items">
+                <!-- Los productos del carrito aparecerán aquí -->
+            </div>
+            
+            <div class="carrito-resumen">
+                <div class="resumen-datos">
+                    <div class="resumen-fila">
+                        <span>Subtotal:</span>
+                        <span id="carrito-subtotal">€0.00</span>
+                    </div>
+                    <div class="resumen-fila">
+                        <span>Envío:</span>
+                        <span id="carrito-envio">€5.99</span>
+                    </div>
+                    <div class="resumen-fila total">
+                        <span>Total:</span>
+                        <span id="carrito-total">€5.99</span>
+                    </div>
+                </div>
+                
+                <div class="carrito-acciones">
+                    <button class="btn-seguir-comprando" onclick="tienda.cerrarModales()">Seguir Comprando</button>
+                    <button class="btn-finalizar-compra" id="btn-finalizar-compra">Finalizar Compra</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DEL CARRITO -->
+<div id="modalCarrito" class="modal">
+    <div class="modal-content carrito-modal">
+        <span class="close">&times;</span>
+        <h2>🛒 Tu Carrito de Compras</h2>
+        
+        <div id="carrito-vacio" class="carrito-vacio">
+            <p>Tu carrito está vacío</p>
+            <button class="btn-seguir-comprando" onclick="tienda.cerrarModales()">Seguir Comprando</button>
+        </div>
+        
+        <div id="carrito-contenido" class="carrito-contenido" style="display: none;">
+            <div class="carrito-items" id="carrito-items">
+                <!-- Los productos del carrito aparecerán aquí -->
+            </div>
+            
+            <div class="carrito-resumen">
+                <div class="resumen-datos">
+                    <div class="resumen-fila">
+                        <span>Subtotal:</span>
+                        <span id="carrito-subtotal">€0.00</span>
+                    </div>
+                    <div class="resumen-fila">
+                        <span>Envío:</span>
+                        <span id="carrito-envio">€5.99</span>
+                    </div>
+                    <div class="resumen-fila total">
+                        <span>Total:</span>
+                        <span id="carrito-total">€5.99</span>
+                    </div>
+                </div>
+                
+                <div class="carrito-acciones">
+                    <button class="btn-seguir-comprando" onclick="tienda.cerrarModales()">Seguir Comprando</button>
+                    <button class="btn-finalizar-compra" id="btn-finalizar-compra">Finalizar Compra</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
