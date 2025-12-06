@@ -596,11 +596,13 @@ buscarProductos(termino) {
     }
 
     cerrarSesion() {
+    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
         this.usuario = null;
         localStorage.removeItem('usuario_newshoes');
         this.actualizarHeader();
         this.mostrarMensaje('Sesión cerrada');
     }
+}
 
     // ========== MÉTODOS DE INTERFAZ (Mantener igual) ==========
     mostrarModal(idModal) {
@@ -616,32 +618,53 @@ buscarProductos(termino) {
         });
     }
 
-    actualizarHeader() {
-        const userActions = document.querySelector('.user-actions');
-        if (!userActions) return;
+actualizarHeader() {
+    const userActions = document.querySelector('.user-actions');
+    if (!userActions) return;
+    
+    if (this.usuario) {
+        // 🔴 INCLUIR EL CARRITO Y EL USUARIO
+        userActions.innerHTML = `
+            <button class="btn-carrito">🛒 Carrito</button>
+            <div class="user-logged">
+                <span class="user-info">👋 ${this.usuario.nombre}</span>
+                <button class="btn-logout" onclick="tienda.cerrarSesion()">Cerrar Sesión</button>
+            </div>
+        `;
         
-        if (this.usuario) {
-            userActions.innerHTML = `
-                <div class="user-logged">
-                    <span class="user-info">👋 ${this.usuario.nombre}</span>
-                    <button class="btn-logout" onclick="tienda.cerrarSesion()">Cerrar Sesión</button>
-                </div>
-            `;
-        } else {
-            userActions.innerHTML = `
-                <button class="btn-carrito">🛒 Carrito</button>
-                <button class="btn-login">👤 Login</button>
-            `;
+        // 🔴 RECONFIGURAR EVENTOS PARA EL CARRITO
+        setTimeout(() => {
+            const btnCarrito = userActions.querySelector('.btn-carrito');
+            if (btnCarrito) {
+                btnCarrito.addEventListener('click', () => {
+                    console.log('🛒 Click en carrito');
+                    this.mostrarCarrito();
+                });
+            }
             
-            setTimeout(() => {
-                const btnLogin = userActions.querySelector('.btn-login');
-                if (btnLogin) {
-                    btnLogin.addEventListener('click', () => this.mostrarModal('modalLogin'));
-                }
-            }, 50);
-        }
+            const btnLogout = userActions.querySelector('.btn-logout');
+            if (btnLogout) {
+                btnLogout.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.cerrarSesion();
+                });
+            }
+        }, 50);
+        
+    } else {
+        userActions.innerHTML = `
+            <button class="btn-carrito">🛒 Carrito</button>
+            <button class="btn-login">👤 Login</button>
+        `;
+        
+        setTimeout(() => {
+            const btnLogin = userActions.querySelector('.btn-login');
+            if (btnLogin) {
+                btnLogin.addEventListener('click', () => this.mostrarModal('modalLogin'));
+            }
+        }, 50);
     }
-
+}
     agregarAlCarrito(id, modelo, precio) {
         if (!this.usuario) {
             this.mostrarMensaje('Inicia sesión para agregar al carrito', 'error');
