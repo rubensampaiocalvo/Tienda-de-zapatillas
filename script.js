@@ -1,4 +1,4 @@
-// script.js - VERSIÓN COMPLETA CON ORDENAMIENTO Y CARRITO
+
 class Newshoes {
     constructor() {
         this.apiUrl = 'http://localhost:3000/api';
@@ -73,10 +73,10 @@ class Newshoes {
         try {
             console.log('📦 Cargando TODOS los productos...');
             
-            // Intentar con /api/productos primero
+           
             let respuesta = await fetch(`${this.apiUrl}/productos`);
             
-            // Si falla, intentar con /api/zapatillas como alternativa
+            
             if (!respuesta.ok) {
                 console.log('⚠️ /api/productos no disponible, intentando /api/zapatillas...');
                 respuesta = await fetch(`${this.apiUrl}/zapatillas`);

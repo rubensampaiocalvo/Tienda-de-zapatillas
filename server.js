@@ -460,3 +460,4 @@ app.listen(PORT, () => {
     console.log(`   ➖ DELETE http://localhost:${PORT}/api/carrito/eliminar (Eliminar del carrito)`);
     console.log(`\n📁 Archivos estáticos servidos desde: ${__dirname}`);
 });
+
