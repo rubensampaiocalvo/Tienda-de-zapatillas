@@ -6,3 +6,167 @@
     <title>Contacto - Newshoes</title>
     <link rel="stylesheet" href="style.css">
     <style>
+
+         .contacto-pagina {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            padding-top: 80px;
+        }
+        
+        .contacto-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .contacto-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+        
+        @media (max-width: 900px) {
+            .contacto-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .contacto-info {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .contacto-formulario {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .contacto-item {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .contacto-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .contacto-item h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .contacto-item p {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 5px;
+        }
+        
+        .contacto-sub {
+            color: #666;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        
+        .contacto-formulario h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .form-desc {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .btn-enviar {
+            background-color: #007bff;
+            color: white;
+            padding: 14px 35px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-enviar:hover {
+            background-color: #0056b3;
+        }
+        
+        .form-nota {
+            text-align: center;
+            margin-top: 15px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .volver-inicio {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .btn-volver {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-volver:hover {
+            background-color: #5a6268;
+        }
