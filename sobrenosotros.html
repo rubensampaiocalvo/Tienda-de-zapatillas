@@ -1,11 +1,332 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sobre Nosotros - Newshoes</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos específicos para la página Sobre Nosotros */
+        .sobre-nosotros-pagina {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            padding-top: 80px;
+        }
+        
+        .sobre-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .sobre-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .sobre-header h1 {
+            font-size: 2.8rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .sobre-subtitulo {
+            color: #666;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .sobre-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+        
+        @media (max-width: 900px) {
+            .sobre-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .sobre-historia,
+        .sobre-valores {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .sobre-historia h2,
+        .sobre-valores h2 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .sobre-texto {
+            color: #444;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            margin-bottom: 25px;
+        }
+        
+        .sobre-texto p {
+            margin-bottom: 15px;
+        }
+        
+        .valores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .valor-item {
+            text-align: center;
+            padding: 25px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .valor-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .valor-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .valor-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .valor-item p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .equipo-section {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 60px;
+        }
+        
+        .equipo-section h2 {
+            color: #007bff;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        
+        .equipo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .equipo-item {
+            text-align: center;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .equipo-foto {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #007bff, #00bfff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .equipo-item h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .equipo-cargo {
+            color: #007bff;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .equipo-desc {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .volver-inicio {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .btn-volver {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-volver:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>👟 Newshoes</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html#inicio">Inicio</a>
+                <a href="index.html#productos">Productos</a>
+                <a href="#" class="active">Sobre Nosotros</a>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+            <div class="user-actions">
+                <button class="btn-carrito" onclick="alert('Carrito - Funcionalidad en desarrollo')">🛒 Carrito</button>
+                <button class="btn-login" onclick="alert('Login - Funcionalidad en desarrollo')">👤 Login</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO DE LA PÁGINA SOBRE NOSOTROS -->
+    <div class="sobre-nosotros-pagina">
+        <div class="sobre-container">
+            <!-- ENCABEZADO -->
+            <div class="sobre-header">
+                <h1>Sobre Newshoes</h1>
+                <p class="sobre-subtitulo">Tu destino para las mejores zapatillas del mercado desde 2010</p>
+            </div>
+            
+            <!-- HISTORIA Y VALORES -->
+            <div class="sobre-grid">
+                <!-- HISTORIA -->
+                <div class="sobre-historia">
+                    <h2>Nuestra Historia</h2>
+                    <div class="sobre-texto">
+                        <p><strong>Newshoes</strong> nació en 2010 con una visión clara: ofrecer a los amantes del calzado deportivo las mejores zapatillas del mercado, combinando estilo, calidad y comodidad.</p>
+                        
+                        <p>Todo comenzó como una pequeña tienda familiar en el corazón de Madrid, donde nuestro fundador, Carlos Rodríguez, un apasionado del running y el baloncesto, decidió compartir su pasión por el calzado deportivo con el mundo.</p>
+                        
+                        <p>A lo largo de más de una década, hemos crecido hasta convertirnos en una referencia en el sector, manteniendo siempre nuestro compromiso con la calidad y la satisfacción del cliente.</p>
+                        
+                        <p>Hoy, contamos con 5 tiendas físicas en España y una tienda online que llega a toda Europa, pero seguimos manteniendo ese espíritu familiar que nos caracteriza desde el primer día.</p>
+                    </div>
+                </div>
+                
+                <!-- VALORES -->
+                <div class="sobre-valores">
+                    <h2>Nuestros Valores</h2>
+                    <div class="valores-grid">
+                        <div class="valor-item">
+                            <span class="valor-icon">⭐</span>
+                            <h3>Calidad</h3>
+                            <p>Trabajamos solo con las mejores marcas y productos certificados</p>
+                        </div>
+                        
+                        <div class="valor-item">
+                            <span class="valor-icon">❤️</span>
+                            <h3>Pasión</h3>
+                            <p>Amamos el deporte y el calzado que lo acompaña</p>
+                        </div>
+                        
+                        <div class="valor-item">
+                            <span class="valor-icon">🤝</span>
+                            <h3>Confianza</h3>
+                            <p>Más de 50,000 clientes satisfechos nos avalan</p>
+                        </div>
+                        
+                        <div class="valor-item">
+                            <span class="valor-icon">🚀</span>
+                            <h3>Innovación</h3>
+                            <p>Siempre a la vanguardia de las últimas tendencias</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- EQUIPO -->
+            <div class="equipo-section">
+                <h2>Conoce a Nuestro Equipo</h2>
+                <div class="equipo-grid">
+                    <div class="equipo-item">
+                        <div class="equipo-foto">CR</div>
+                        <h3>Carlos Rodríguez</h3>
+                        <p class="equipo-cargo">Fundador & CEO</p>
+                        <p class="equipo-desc">Más de 15 años de experiencia en el sector deportivo. Maratonista aficionado.</p>
+                    </div>
+                    
+                    <div class="equipo-item">
+                        <div class="equipo-foto">MP</div>
+                        <h3>María Pérez</h3>
+                        <p class="equipo-cargo">Directora de Compras</p>
+                        <p class="equipo-desc">Especialista en zapatillas de running. Siempre busca las mejores novedades.</p>
+                    </div>
+                    
+                    <div class="equipo-item">
+                        <div class="equipo-foto">AL</div>
+                        <h3>Andrés López</h3>
+                        <p class="equipo-cargo">Asesor Técnico</p>
+                        <p class="equipo-desc">Experto en biomecánica. Te ayudará a encontrar el calzado perfecto.</p>
+                    </div>
+                    
+                    <div class="equipo-item">
+                        <div class="equipo-foto">SG</div>
+                        <h3>Sofía García</h3>
+                        <p class="equipo-cargo">Atención al Cliente</p>
+                        <p class="equipo-desc">Tu contacto principal. Resuelve dudas y gestiona pedidos con una sonrisa.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LOGROS -->
+            <div class="sobre-historia">
+                <h2>Nuestros Logros</h2>
+                <div class="sobre-texto">
+                    <p>🏆 <strong>Premio a la Mejor Tienda de Calzado Deportivo 2023</strong> - Reconocimiento otorgado por la Asociación Española de Comercio Deportivo.</p>
+                    
+                    <p>📈 <strong>+50,000 clientes satisfechos</strong> en toda España y Europa.</p>
+                    
+                    <p>🤝 <strong>Colaboraciones oficiales</strong> con las principales marcas: Nike, Adidas, Jordan, Puma y New Balance.</p>
+                    
+                    <p>🌱 <strong>Compromiso sostenible</strong> - Programa de reciclaje de calzado deportivo desde 2018.</p>
+                    
+                    <p>🚚 <strong>Envío gratuito</strong> a toda España en pedidos superiores a 50€.</p>
+                </div>
+            </div>
+            
+            <!-- BOTÓN VOLVER -->
+            <div class="volver-inicio">
+                <a href="index.html#inicio" class="btn-volver">← Volver a la tienda</a>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
