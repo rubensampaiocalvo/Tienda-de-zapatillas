@@ -170,3 +170,126 @@
         .btn-volver:hover {
             background-color: #5a6268;
         }
+        </style>
+</head>
+<body>
+    <!-- HEADER (igual que en la página principal) -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>👟 Newshoes</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html#inicio">Inicio</a>
+                <a href="index.html#productos">Productos</a>
+                <a href="#" class="active">Contacto</a>
+            </nav>
+            <div class="user-actions">
+                <button class="btn-carrito" onclick="alert('Carrito - Funcionalidad en desarrollo')">🛒 Carrito</button>
+                <button class="btn-login" onclick="alert('Login - Funcionalidad en desarrollo')">👤 Login</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO DE LA PÁGINA DE CONTACTO -->
+    <div class="contacto-pagina">
+        <div class="contacto-container">
+            <div class="contacto-grid">
+                <!-- INFORMACIÓN DE CONTACTO -->
+                <div class="contacto-info">
+                    <div class="contacto-item">
+                        <h3>📧 Email</h3>
+                        <p>contacto@newshoes.com</p>
+                        <p class="contacto-sub">Respondemos en 24h</p>
+                    </div>
+                    
+                    <div class="contacto-item">
+                        <h3>📱 Teléfono</h3>
+                        <p>+34 912 345 678</p>
+                        <p class="contacto-sub">Lunes a Viernes 9-18h</p>
+                    </div>
+                    
+                    <div class="contacto-item">
+                        <h3>📍 Tienda Física</h3>
+                        <p>Calle de las Zapatillas, 123<br>Madrid, España</p>
+                        <p class="contacto-sub">Ven a probarte nuestras zapatillas</p>
+                    </div>
+                </div>
+                
+                <!-- FORMULARIO DE CONTACTO -->
+                <div class="contacto-formulario">
+                    <h2>Envíanos un mensaje</h2>
+                    <p class="form-desc">¿Tienes alguna pregunta? Escríbenos y te responderemos pronto.</p>
+                    
+                    <form id="form-contacto">
+                        <div class="form-group">
+                            <label for="nombre">Nombre completo *</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required placeholder="tu@email.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="asunto">Asunto *</label>
+                            <input type="text" id="asunto" name="asunto" required placeholder="Ej: Consulta sobre pedido, tallas, etc.">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="mensaje">Mensaje *</label>
+                            <textarea id="mensaje" name="mensaje" rows="6" required placeholder="Escribe tu mensaje aquí..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-enviar">Enviar Mensaje</button>
+                        <p class="form-nota">* Campos obligatorios</p>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="volver-inicio">
+                <a href="index.html#inicio" class="btn-volver">← Volver a la tienda</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Manejo del formulario de contacto
+        document.addEventListener('DOMContentLoaded', function() {
+            const formContacto = document.getElementById('form-contacto');
+            
+            if (formContacto) {
+                formContacto.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Obtener valores del formulario
+                    const nombre = document.getElementById('nombre').value;
+                    const email = document.getElementById('email').value;
+                    const asunto = document.getElementById('asunto').value;
+                    const mensaje = document.getElementById('mensaje').value;
+                    
+                    // Validación simple
+                    if (!nombre || !email || !asunto || !mensaje) {
+                        alert('Por favor, completa todos los campos obligatorios.');
+                        return;
+                    }
+                    
+                    // Simular envío del formulario
+                    console.log('Mensaje de contacto enviado:');
+                    console.log('Nombre:', nombre);
+                    console.log('Email:', email);
+                    console.log('Asunto:', asunto);
+                    console.log('Mensaje:', mensaje);
+                    
+                    // Mostrar mensaje de éxito
+                    alert(`✅ ¡Mensaje enviado con éxito!\n\nGracias ${nombre}, hemos recibido tu mensaje sobre "${asunto}".\nTe responderemos a ${email} en un plazo de 24-48 horas.`);
+                    
+                    // Limpiar formulario
+                    formContacto.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
