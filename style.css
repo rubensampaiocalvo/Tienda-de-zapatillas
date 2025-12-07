@@ -1,4 +1,4 @@
-/* Reset básico */
+
 * {
     margin: 0;
     padding: 0;
@@ -238,12 +238,12 @@ body {
     width: 100%;
     justify-items: center;
     
-    /* CORREGIR ESTO: */
-    margin-top: 20px;      /* Solo 20px de espacio arriba */
-    margin-left: 0;        /* Centrado normal */
     
-    /* O si quieres centrarlo horizontalmente: */
-    margin: 20px auto 0 auto; /* 20px arriba, centrado horizontal */
+    margin-top: 20px;      
+    margin-left: 0;        
+    
+    
+    margin: 20px auto 0 auto; 
 }
 
 /* ESTILO PARA EL ID TAMBIÉN */
@@ -543,19 +543,19 @@ body {
     background: #d32f2f;
 }
 
-/* OCULTAR LA TABLA DE ARRIBA QUE NO NECESITAS */
+
 table {
     display: none !important;
 }
 
-/* O si tiene una clase específica */
+
 .lifestyle-table,
 .runner-table,
 .basket-table {
     display: none !important;
 }
 
-/* FORZAR VISIBILIDAD DEL GRID - DIAGNÓSTICO */
+
 #grid-productos {
     border: 5px solid green !important;
     background: rgba(0, 255, 0, 0.2) !important;
@@ -563,11 +563,11 @@ table {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     
-    /* AÑADE ESTO PARA MOVERLO ABAJO: */
-    margin-top: 2100px !important; /* 50px hacia abajo */
+    
+    margin-top: 2100px !important;
 }
 
-/* Si el grid sigue vacío, mostrar productos de ejemplo */
+
 #grid-productos:empty::before {
     content: "⚠️ Grid está vacío. Cargando productos de ejemplo...";
     display: block;
@@ -585,22 +585,21 @@ table {
     gap: 25px;
     grid-column: 1 / -1;
 }
-/* ========== ESTILOS PARA BÚSQUEDA DINÁMICA ========== */
 
-/* NORMALMENTE: productos con espacio abajo */
+
 #grid-productos {
-    margin-top: 60px; /* Espacio por defecto */
+    margin-top: 60px; 
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* CUANDO SE BUSCA: productos suben arriba */
+
 #productos.buscando #grid-productos {
-    margin-top: 10px !important; /* Casi arriba */
+    margin-top: 10px !important; 
     transform: translateY(-15px);
     animation: destacarBusqueda 0.5s ease;
 }
 
-/* Animación para destacar resultados */
+
 @keyframes destacarBusqueda {
     0% {
         transform: translateY(0);
